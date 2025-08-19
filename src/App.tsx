@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+/* eslint-env browser */
+import React, { useEffect, useState } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
 import Holidays from 'date-holidays';
 
@@ -74,11 +75,18 @@ function formatDuration(seconds: number): string {
 
 export default function App() {
   const [now, setNow] = useState(Temporal.Now.zonedDateTimeISO(tz));
+  const [dark, setDark] = useState(() =>
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Temporal.Now.zonedDateTimeISO(tz)), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+  }, [dark]);
 
   const targets = [
     { label: '月末', date: endOfMonth(now) },
@@ -88,30 +96,48 @@ export default function App() {
   ];
 
   return (
-    <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h1>カウントダウン</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>対象</th>
-            <th>残り時間</th>
-            <th>営業日</th>
-          </tr>
-        </thead>
-        <tbody>
-          {targets.map((t) => {
-            const seconds = Math.floor(t.date.epochSeconds - now.epochSeconds);
-            const business = businessDaysBetween(now.toPlainDate(), t.date.toPlainDate());
-            return (
-              <tr key={t.label}>
-                <td>{t.label} ({new Date(t.date.epochMilliseconds).toLocaleDateString('ja-JP')})</td>
-                <td>{formatDuration(seconds)}</td>
-                <td>{business}</td>
+    <div className="min-h-screen p-4 font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold">カウントダウン</h1>
+          <button
+            type="button"
+            onClick={() => setDark((d) => !d)}
+            className="px-3 py-1 text-sm border rounded dark:border-gray-700"
+          >
+            {dark ? 'ライト' : 'ダーク'}
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <th className="p-2">対象</th>
+                <th className="p-2">残り時間</th>
+                <th className="p-2">営業日</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {targets.map((t) => {
+                const seconds = Math.floor(t.date.epochSeconds - now.epochSeconds);
+                const business = businessDaysBetween(now.toPlainDate(), t.date.toPlainDate());
+                return (
+                  <tr
+                    key={t.label}
+                    className="border-b border-gray-200 dark:border-gray-700 odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800"
+                  >
+                    <td className="p-2">
+                      {t.label} ({new Date(t.date.epochMilliseconds).toLocaleDateString('ja-JP')})
+                    </td>
+                    <td className="p-2">{formatDuration(seconds)}</td>
+                    <td className="p-2">{business}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

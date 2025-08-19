@@ -14,6 +14,13 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
       },
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        HTMLElement: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tseslint,
