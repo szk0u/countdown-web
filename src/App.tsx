@@ -25,9 +25,9 @@ function endOfQuarter(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
 }
 
 function endOfHalfYear(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
-  const startNextHalf = now.month <= 6 ? 7 : 13;
-  const year = startNextHalf > 12 ? now.year + 1 : now.year;
-  const month = ((startNextHalf - 1) % 12) + 1;
+  const startNextHalf = now.month <= 9 ? 10 : 4;
+  const year = startNextHalf === 4 ? now.year + 1 : now.year;
+  const month = startNextHalf;
   return now
     .with({ year, month, day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0, nanosecond: 0 })
     .subtract({ nanoseconds: 1 });
