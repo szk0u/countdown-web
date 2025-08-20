@@ -9,14 +9,14 @@ React + TypeScript の静的サイトです。月末、四半期末、半期末�
 ## 開発
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## ビルド
 
 ```sh
-npm run build
+pnpm run build
 ```
 
 ## デプロイ
@@ -24,5 +24,5 @@ npm run build
 GitHub Pages にデプロイする場合は GitHub Actions の `Deploy` ワークフローを利用するか、以下のコマンドで `gh-pages` ブランチへデプロイできます。
 
 ```sh
-npm run deploy
+pnpm run deploy
 ```
