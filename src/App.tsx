@@ -71,6 +71,24 @@ export default function App() {
   const [dark, setDark] = useState(() =>
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
+  const [customTarget, setCustomTarget] = useState<{ label: string; date: string } | null>(null);
+  const [inputLabel, setInputLabel] = useState('');
+  const [inputDate, setInputDate] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('customTarget');
+    if (saved) {
+      setCustomTarget(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (customTarget) {
+      localStorage.setItem('customTarget', JSON.stringify(customTarget));
+    } else {
+      localStorage.removeItem('customTarget');
+    }
+  }, [customTarget]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Temporal.Now.zonedDateTimeISO(tz)), 1000);
@@ -81,32 +99,48 @@ export default function App() {
     document.documentElement.classList.toggle('dark', dark);
   }, [dark]);
 
-  const targets = [
-    { 
-      label: '月末', 
+  const allTargets = [
+    {
+      label: '月末',
       date: endOfMonth(now),
       icon: '📅',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-blue-500 to-cyan-500',
     },
-    { 
-      label: '四半期末', 
+    {
+      label: '四半期末',
       date: endOfQuarter(now),
       icon: '📊',
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-purple-500 to-pink-500',
     },
-    { 
-      label: '半期末', 
+    {
+      label: '半期末',
       date: endOfHalfYear(now),
       icon: '📈',
-      color: 'from-green-500 to-teal-500'
+      color: 'from-green-500 to-teal-500',
     },
-    { 
-      label: '年度末', 
+    {
+      label: '年度末',
       date: endOfFiscalYear(now),
       icon: '🎯',
-      color: 'from-orange-500 to-red-500'
+      color: 'from-orange-500 to-red-500',
     },
   ];
+
+  if (customTarget && customTarget.date) {
+    const customDate = Temporal.PlainDate.from(customTarget.date)
+      .add({ days: 1 })
+      .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
+      .subtract({ nanoseconds: 1 });
+
+    if (Temporal.ZonedDateTime.compare(customDate, now) > 0) {
+      allTargets.unshift({
+        label: customTarget.label,
+        date: customDate,
+        icon: '📌',
+        color: 'from-yellow-500 to-amber-500',
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-colors duration-300">
@@ -121,12 +155,12 @@ export default function App() {
                 カウントダウン
               </h1>
               <p className="text-slate-600 dark:text-slate-400 mt-1">
-                {now.toLocaleString('ja-JP', { 
-                  year: 'numeric', 
-                  month: 'long', 
+                {now.toLocaleString('ja-JP', {
+                  year: 'numeric',
+                  month: 'long',
                   day: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })}
               </p>
             </div>
@@ -142,9 +176,70 @@ export default function App() {
             </div>
           </button>
         </div>
-        
+
+        <div className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">
+            カスタムターゲット
+          </h2>
+          {customTarget ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-slate-700 dark:text-slate-300">{customTarget.label}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  {new Date(customTarget.date + 'T00:00:00').toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCustomTarget(null)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                クリア
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (inputLabel && inputDate) {
+                  setCustomTarget({ label: inputLabel, date: inputDate });
+                  setInputLabel('');
+                  setInputDate('');
+                }
+              }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <input
+                type="text"
+                value={inputLabel}
+                onChange={(e) => setInputLabel(e.target.value)}
+                placeholder="イベント名"
+                className="flex-grow px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                required
+              />
+              <input
+                type="date"
+                value={inputDate}
+                onChange={(e) => setInputDate(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                required
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+              >
+                保存
+              </button>
+            </form>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {targets.map((target, index) => {
+          {allTargets.map((target, index) => {
             const seconds = Math.floor(target.date.epochSeconds - now.epochSeconds);
             const business = businessDaysBetween(now.toPlainDate(), target.date.toPlainDate());
             const days = Math.floor(seconds / 86400);
