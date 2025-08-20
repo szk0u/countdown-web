@@ -9,7 +9,15 @@ const hd = new Holidays('JP');
 
 function endOfMonth(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
   return now
-    .with({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0, nanosecond: 0 })
+    .with({
+      day: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0,
+    })
     .add({ months: 1 })
     .subtract({ nanoseconds: 1 });
 }
@@ -20,7 +28,17 @@ function endOfQuarter(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
   const year = startNextQuarterMonth > 12 ? now.year + 1 : now.year;
   const month = ((startNextQuarterMonth - 1) % 12) + 1;
   return now
-    .with({ year, month, day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0, nanosecond: 0 })
+    .with({
+      year,
+      month,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0,
+    })
     .subtract({ nanoseconds: 1 });
 }
 
@@ -29,7 +47,17 @@ function endOfHalfYear(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
   const year = startNextHalf === 4 ? now.year + 1 : now.year;
   const month = startNextHalf;
   return now
-    .with({ year, month, day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0, nanosecond: 0 })
+    .with({
+      year,
+      month,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0,
+    })
     .subtract({ nanoseconds: 1 });
 }
 
@@ -65,12 +93,11 @@ function businessDaysBetween(start: Temporal.PlainDate, end: Temporal.PlainDate)
   return count;
 }
 
-
 export default function App() {
   const customTargetSectionRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(Temporal.Now.zonedDateTimeISO(tz));
-  const [dark, setDark] = useState(() =>
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const [dark, setDark] = useState(
+    () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
   const [simple, setSimple] = useState(false);
   const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
@@ -114,9 +141,7 @@ export default function App() {
   };
 
   const handleDeleteTarget = (idToDelete: string) => {
-    setCustomTargets((prevTargets) =>
-      prevTargets.filter((target) => target.id !== idToDelete)
-    );
+    setCustomTargets((prevTargets) => prevTargets.filter((target) => target.id !== idToDelete));
   };
 
   const allTargets = [
@@ -192,7 +217,10 @@ export default function App() {
                 onClick={() => {
                   setIsFormVisible(true);
                   setTimeout(() => {
-                    customTargetSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    customTargetSectionRef.current?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'center',
+                    });
                   }, 100);
                 }}
                 className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
@@ -227,14 +255,20 @@ export default function App() {
         </div>
 
         {isFormVisible && (
-          <div ref={customTargetSectionRef} className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
+          <div
+            ref={customTargetSectionRef}
+            className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50"
+          >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
             </div>
 
             <div className="space-y-3 mb-4">
               {customTargets.map((target) => (
-                <div key={target.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
+                <div
+                  key={target.id}
+                  className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg"
+                >
                   <div>
                     <p className="font-semibold text-slate-700 dark:text-slate-300">{target.label}</p>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -301,39 +335,41 @@ export default function App() {
             const hours = Math.floor((seconds % 86400) / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
             const secs = seconds % 60;
-            
+
             return (
               <div
                 key={target.label}
                 className="group relative bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-white/50 dark:border-slate-700/50"
                 style={{
                   animationDelay: `${index * 100}ms`,
-                  animation: 'fadeInUp 0.6s ease-out forwards'
+                  animation: 'fadeInUp 0.6s ease-out forwards',
                 }}
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${target.color} opacity-5 group-hover:opacity-10 rounded-3xl transition-opacity duration-300`}></div>
-                
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${target.color} opacity-5 group-hover:opacity-10 rounded-3xl transition-opacity duration-300`}
+                ></div>
+
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${target.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                      <div
+                        className={`w-12 h-12 bg-gradient-to-r ${target.color} rounded-2xl flex items-center justify-center shadow-lg`}
+                      >
                         <span className="text-2xl">{target.icon}</span>
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">
-                          {target.label}
-                        </h2>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">{target.label}</h2>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
                           {new Date(target.date.epochMilliseconds).toLocaleDateString('ja-JP', {
                             year: 'numeric',
                             month: 'long',
-                            day: 'numeric'
+                            day: 'numeric',
                           })}
                         </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {simple ? (
                     <div className="grid grid-cols-2 gap-2">
                       <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
@@ -371,9 +407,7 @@ export default function App() {
                           <span className="text-sm">💼</span>
                           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">営業日</span>
                         </div>
-                        <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
-                          {business}日
-                        </div>
+                        <div className="text-xl font-bold text-slate-800 dark:text-slate-200">{business}日</div>
                       </div>
                     </div>
                   )}
@@ -382,7 +416,6 @@ export default function App() {
             );
           })}
         </div>
-
       </div>
     </div>
   );
