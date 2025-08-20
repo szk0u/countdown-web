@@ -134,7 +134,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => setDark((d) => !d)}
-            className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
           >
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <span className="text-lg">{dark ? '☀️' : '🌙'}</span>
