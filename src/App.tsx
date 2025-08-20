@@ -146,7 +146,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setSimple((s) => !s)}
-              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
             >
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{simple ? '🔢' : '📅'}</span>
@@ -197,7 +197,12 @@ export default function App() {
                     </div>
                   </div>
                   
-                  {!simple && (
+                  {simple ? (
+                    <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                      <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{days}</div>
+                      <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">日</div>
+                    </div>
+                  ) : (
                     <div className="space-y-4">
                       <div className="grid grid-cols-4 gap-2">
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
