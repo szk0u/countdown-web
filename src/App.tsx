@@ -72,6 +72,7 @@ export default function App() {
   const [dark, setDark] = useState(() =>
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
+  const [simple, setSimple] = useState(false);
   const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
@@ -202,11 +203,21 @@ export default function App() {
             <button
               type="button"
               onClick={() => setDark((d) => !d)}
-              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
             >
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{dark ? '☀️' : '🌙'}</span>
                 <span className="font-medium">{dark ? 'ライト' : 'ダーク'}</span>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSimple((s) => !s)}
+              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
+            >
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-lg">{simple ? '🔢' : '📅'}</span>
+                <span className="font-medium">{simple ? '詳細' : 'シンプル'}</span>
               </div>
             </button>
           </div>
@@ -320,48 +331,55 @@ export default function App() {
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-4 gap-2">
+                  {simple ? (
+                    <div className="grid grid-cols-2 gap-2">
                       <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
                         <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{days}</div>
                         <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">日</div>
                       </div>
                       <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{hours}</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">時間</div>
-                      </div>
-                      <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{minutes}</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">分</div>
-                      </div>
-                      <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{secs}</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">秒</div>
+                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{business}</div>
+                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">営業日</div>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/30 dark:to-slate-600/30 rounded-2xl">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">💼</span>
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">営業日</span>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                          <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{days}</div>
+                          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">日</div>
+                        </div>
+                        <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                          <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{hours}</div>
+                          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">時間</div>
+                        </div>
+                        <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                          <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{minutes}</div>
+                          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">分</div>
+                        </div>
+                        <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                          <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{secs}</div>
+                          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">秒</div>
+                        </div>
                       </div>
-                      <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
-                        {business}日
+
+                      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/30 dark:to-slate-600/30 rounded-2xl">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">💼</span>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">営業日</span>
+                        </div>
+                        <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                          {business}日
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
         
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-full border border-white/50 dark:border-slate-700/50">
-            <span className="animate-pulse w-2 h-2 bg-green-500 rounded-full"></span>
-            <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">リアルタイム更新中</span>
-          </div>
-        </div>
       </div>
     </div>
   );
