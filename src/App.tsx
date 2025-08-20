@@ -71,24 +71,21 @@ export default function App() {
   const [dark, setDark] = useState(() =>
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
-  const [customTarget, setCustomTarget] = useState<{ label: string; date: string } | null>(null);
+  const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
   const [inputDate, setInputDate] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('customTarget');
+    const saved = localStorage.getItem('customTargets');
     if (saved) {
-      setCustomTarget(JSON.parse(saved));
+      setCustomTargets(JSON.parse(saved));
     }
   }, []);
 
   useEffect(() => {
-    if (customTarget) {
-      localStorage.setItem('customTarget', JSON.stringify(customTarget));
-    } else {
-      localStorage.removeItem('customTarget');
-    }
-  }, [customTarget]);
+    localStorage.setItem('customTargets', JSON.stringify(customTargets));
+  }, [customTargets]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Temporal.Now.zonedDateTimeISO(tz)), 1000);
@@ -98,6 +95,27 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
   }, [dark]);
+
+  const handleAddTarget = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputLabel && inputDate) {
+      const newTarget = {
+        id: Date.now().toString(),
+        label: inputLabel,
+        date: inputDate,
+      };
+      setCustomTargets((prevTargets) => [...prevTargets, newTarget]);
+      setInputLabel('');
+      setInputDate('');
+      setIsFormVisible(false);
+    }
+  };
+
+  const handleDeleteTarget = (idToDelete: string) => {
+    setCustomTargets((prevTargets) =>
+      prevTargets.filter((target) => target.id !== idToDelete)
+    );
+  };
 
   const allTargets = [
     {
@@ -126,21 +144,21 @@ export default function App() {
     },
   ];
 
-  if (customTarget && customTarget.date) {
-    const customDate = Temporal.PlainDate.from(customTarget.date)
+  customTargets.forEach((target) => {
+    const customDate = Temporal.PlainDate.from(target.date)
       .add({ days: 1 })
       .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
       .subtract({ nanoseconds: 1 });
 
     if (Temporal.ZonedDateTime.compare(customDate, now) > 0) {
       allTargets.unshift({
-        label: customTarget.label,
+        label: target.label,
         date: customDate,
         icon: '📌',
         color: 'from-yellow-500 to-amber-500',
       });
     }
-  }
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-colors duration-300">
@@ -178,62 +196,77 @@ export default function App() {
         </div>
 
         <div className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">
-            カスタムターゲット
-          </h2>
-          {customTarget ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-slate-700 dark:text-slate-300">{customTarget.label}</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {new Date(customTarget.date + 'T00:00:00').toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
-              </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
+            {!isFormVisible && (
               <button
                 type="button"
-                onClick={() => setCustomTarget(null)}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                onClick={() => setIsFormVisible(true)}
+                className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"
               >
-                クリア
+                新規追加
               </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (inputLabel && inputDate) {
-                  setCustomTarget({ label: inputLabel, date: inputDate });
-                  setInputLabel('');
-                  setInputDate('');
-                }
-              }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <input
-                type="text"
-                value={inputLabel}
-                onChange={(e) => setInputLabel(e.target.value)}
-                placeholder="イベント名"
-                className="flex-grow px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
-                required
-              />
-              <input
-                type="date"
-                value={inputDate}
-                onChange={(e) => setInputDate(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
-                required
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
-              >
-                保存
-              </button>
+            )}
+          </div>
+
+          <div className="space-y-3 mb-4">
+            {customTargets.map((target) => (
+              <div key={target.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{target.label}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {new Date(target.date + 'T00:00:00').toLocaleDateString('ja-JP', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteTarget(target.id)}
+                  className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
+                >
+                  削除
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {isFormVisible && (
+            <form onSubmit={handleAddTarget} className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="text"
+                  value={inputLabel}
+                  onChange={(e) => setInputLabel(e.target.value)}
+                  placeholder="イベント名"
+                  className="flex-grow px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                  required
+                />
+                <input
+                  type="date"
+                  value={inputDate}
+                  onChange={(e) => setInputDate(e.target.value)}
+                  className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsFormVisible(false)}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+                >
+                  保存
+                </button>
+              </div>
             </form>
           )}
         </div>
