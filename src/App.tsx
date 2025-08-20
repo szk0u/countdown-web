@@ -198,9 +198,15 @@ export default function App() {
                   </div>
                   
                   {simple ? (
-                    <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-                      <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{days}</div>
-                      <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">日</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{days}</div>
+                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">日</div>
+                      </div>
+                      <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                        <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">{business}</div>
+                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">営業日</div>
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
