@@ -220,12 +220,6 @@ export default function App() {
           })}
         </div>
         
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/30 dark:bg-slate-800/30 backdrop-blur-sm rounded-full border border-white/50 dark:border-slate-700/50">
-            <span className="animate-pulse w-2 h-2 bg-green-500 rounded-full"></span>
-            <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">リアルタイム更新中</span>
-          </div>
-        </div>
       </div>
     </div>
   );
