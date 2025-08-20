@@ -21,6 +21,8 @@ export default [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         HTMLElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        setTimeout: 'readonly',
       },
     },
     plugins: {

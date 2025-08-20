@@ -1,6 +1,6 @@
 /* eslint-env browser */
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
 import Holidays from 'date-holidays';
 
@@ -67,6 +67,7 @@ function businessDaysBetween(start: Temporal.PlainDate, end: Temporal.PlainDate)
 
 
 export default function App() {
+  const customTargetSectionRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(Temporal.Now.zonedDateTimeISO(tz));
   const [dark, setDark] = useState(() =>
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -183,30 +184,37 @@ export default function App() {
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setDark((d) => !d)}
-            className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl"
-          >
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-              <span className="text-lg">{dark ? '☀️' : '🌙'}</span>
-              <span className="font-medium">{dark ? 'ライト' : 'ダーク'}</span>
-            </div>
-          </button>
-        </div>
-
-        <div className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
+          <div className="flex items-center gap-4">
             {!isFormVisible && (
               <button
                 type="button"
-                onClick={() => setIsFormVisible(true)}
+                onClick={() => {
+                  setIsFormVisible(true);
+                  setTimeout(() => {
+                    customTargetSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 100);
+                }}
                 className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"
               >
                 新規追加
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => setDark((d) => !d)}
+              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-lg">{dark ? '☀️' : '🌙'}</span>
+                <span className="font-medium">{dark ? 'ライト' : 'ダーク'}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div ref={customTargetSectionRef} className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
           </div>
 
           <div className="space-y-3 mb-4">
