@@ -195,9 +195,12 @@ export default function App() {
                     customTargetSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   }, 100);
                 }}
-                className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"
+                className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
               >
-                新規追加
+                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <span className="text-lg">➕</span>
+                  <span className="font-medium">新規追加</span>
+                </div>
               </button>
             )}
             <button
@@ -223,36 +226,36 @@ export default function App() {
           </div>
         </div>
 
-        <div ref={customTargetSectionRef} className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
-          </div>
+        {isFormVisible && (
+          <div ref={customTargetSectionRef} className="mb-8 p-6 bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 dark:border-slate-700/50">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
+            </div>
 
-          <div className="space-y-3 mb-4">
-            {customTargets.map((target) => (
-              <div key={target.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
-                <div>
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">{target.label}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {new Date(target.date + 'T00:00:00').toLocaleDateString('ja-JP', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
+            <div className="space-y-3 mb-4">
+              {customTargets.map((target) => (
+                <div key={target.id} className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
+                  <div>
+                    <p className="font-semibold text-slate-700 dark:text-slate-300">{target.label}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {new Date(target.date + 'T00:00:00').toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTarget(target.id)}
+                    className="px-3 py-1 text-sm font-medium text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20 rounded-md hover:bg-red-500/20 dark:hover:bg-red-500/30 transition-colors"
+                  >
+                    削除
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteTarget(target.id)}
-                  className="px-3 py-1 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
-                >
-                  削除
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {isFormVisible && (
             <form onSubmit={handleAddTarget} className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <input
@@ -260,35 +263,35 @@ export default function App() {
                   value={inputLabel}
                   onChange={(e) => setInputLabel(e.target.value)}
                   placeholder="イベント名"
-                  className="flex-grow px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                  className="flex-grow px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200 backdrop-blur-sm"
                   required
                 />
                 <input
                   type="date"
                   value={inputDate}
                   onChange={(e) => setInputDate(e.target.value)}
-                  className="px-4 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200"
+                  className="px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200 backdrop-blur-sm"
                   required
                 />
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={() => setIsFormVisible(false)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                  className="group relative px-6 py-2 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer active:scale-95"
                 >
-                  キャンセル
+                  <span className="font-medium text-slate-700 dark:text-slate-300">キャンセル</span>
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+                  className="group relative px-6 py-2 bg-blue-500/20 dark:bg-blue-500/50 backdrop-blur-sm border border-blue-500/30 dark:border-blue-500/50 rounded-xl hover:bg-blue-500/30 dark:hover:bg-blue-500/70 transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer active:scale-95"
                 >
-                  保存
+                  <span className="font-medium text-blue-700 dark:text-blue-300">保存</span>
                 </button>
               </div>
             </form>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {allTargets.map((target, index) => {
