@@ -3,6 +3,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import type { Linter } from 'eslint';
 
 export default [
   {
@@ -40,4 +41,4 @@ export default [
       ...tseslint.configs.recommended.rules,
     },
   },
-];
+] satisfies Linter.FlatConfig[];
