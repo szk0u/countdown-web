@@ -99,7 +99,10 @@ export default function App() {
   const [dark, setDark] = useState(
     () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   );
-  const [simple, setSimple] = useState(false);
+  const [simple, setSimple] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('simple') === 'true';
+  });
   const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
@@ -124,6 +127,16 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
   }, [dark]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (simple) {
+      url.searchParams.set('simple', 'true');
+    } else {
+      url.searchParams.delete('simple');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [simple]);
 
   const handleAddTarget = (e: React.FormEvent) => {
     e.preventDefault();
