@@ -107,13 +107,12 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [targetFromUrl, setTargetFromUrl] = useState(() => {
+  const [targetFromUrl] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('name');
     const date = params.get('date');
     if (name && date) {
-      return { label: name, date: date };
+      return { label: name, date };
     }
     return null;
   });
