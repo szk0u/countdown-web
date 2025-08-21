@@ -96,9 +96,13 @@ function businessDaysBetween(start: Temporal.PlainDate, end: Temporal.PlainDate)
 export default function App() {
   const customTargetSectionRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(Temporal.Now.zonedDateTimeISO(tz));
-  const [dark, setDark] = useState(
-    () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  );
+  const [dark, setDark] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get('dark');
+    if (param === 'true') return true;
+    if (param === 'false') return false;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const [simple, setSimple] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
@@ -136,6 +140,9 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
+    const url = new URL(window.location.href);
+    url.searchParams.set('dark', dark ? 'true' : 'false');
+    window.history.replaceState({}, '', url.toString());
   }, [dark]);
 
   useEffect(() => {
@@ -368,7 +375,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {allTargets.map((target, index) => {
-            const seconds = Math.floor(target.date.epochSeconds - now.epochSeconds);
+            const seconds = Math.floor((target.date.epochMilliseconds - now.epochMilliseconds) / 1000);
             const business = businessDaysBetween(now.toPlainDate(), target.date.toPlainDate());
             const days = Math.floor(seconds / 86400);
             const hours = Math.floor((seconds % 86400) / 3600);
