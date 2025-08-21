@@ -24,6 +24,8 @@ export default [
         HTMLElement: 'readonly',
         HTMLDivElement: 'readonly',
         setTimeout: 'readonly',
+        URLSearchParams: 'readonly',
+        URL: 'readonly',
       },
     },
     plugins: {
@@ -39,4 +41,4 @@ export default [
       ...tseslint.configs.recommended.rules,
     },
   },
-] satisfies Linter.FlatConfig[];
+] satisfies Linter.Config[];
