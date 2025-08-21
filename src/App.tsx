@@ -103,6 +103,16 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [targetFromUrl, setTargetFromUrl] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    const date = params.get('date');
+    if (name && date) {
+      return { label: name, date: date };
+    }
+    return null;
+  });
   const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
@@ -199,6 +209,22 @@ export default function App() {
       });
     }
   });
+
+  if (targetFromUrl) {
+    const urlDate = Temporal.PlainDate.from(targetFromUrl.date)
+      .add({ days: 1 })
+      .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
+      .subtract({ nanoseconds: 1 });
+
+    if (Temporal.ZonedDateTime.compare(urlDate, now) > 0) {
+      allTargets.unshift({
+        label: targetFromUrl.label,
+        date: urlDate,
+        icon: '🔗',
+        color: 'from-pink-500 to-rose-500',
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-colors duration-300">
