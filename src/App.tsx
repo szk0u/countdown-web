@@ -121,17 +121,68 @@ export default function App() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
   const [inputDate, setInputDate] = useState('');
+  const [saveLocation, setSaveLocation] = useState<'localStorage' | 'urlParams'>(() => {
+    return (localStorage.getItem('saveLocation') as 'localStorage' | 'urlParams') || 'localStorage';
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem('customTargets');
-    if (saved) {
-      setCustomTargets(JSON.parse(saved));
+    localStorage.setItem('saveLocation', saveLocation);
+  }, [saveLocation]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const targetsParam = params.get('targets');
+    const savedPreference = (localStorage.getItem('saveLocation') as 'localStorage' | 'urlParams') || 'localStorage';
+
+    let loadedFromUrl = false;
+    if (targetsParam) {
+      try {
+        const decoded = atob(targetsParam);
+        setCustomTargets(JSON.parse(decoded));
+        setSaveLocation('urlParams');
+        loadedFromUrl = true;
+      } catch (e) {
+        console.error('Failed to parse custom targets from URL, falling back.', e);
+      }
+    }
+
+    if (!loadedFromUrl) {
+      setSaveLocation(savedPreference);
+      if (savedPreference === 'localStorage') {
+        const saved = localStorage.getItem('customTargets');
+        if (saved) {
+          try {
+            setCustomTargets(JSON.parse(saved));
+          } catch (e) {
+            console.error('Failed to parse custom targets from localStorage', e);
+          }
+        }
+      }
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('customTargets', JSON.stringify(customTargets));
-  }, [customTargets]);
+    if (saveLocation === 'localStorage') {
+      localStorage.setItem('customTargets', JSON.stringify(customTargets));
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('targets')) {
+        url.searchParams.delete('targets');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } else {
+      // urlParams
+      localStorage.removeItem('customTargets');
+      const url = new URL(window.location.href);
+      if (customTargets.length > 0) {
+        const json = JSON.stringify(customTargets);
+        const encoded = btoa(json);
+        url.searchParams.set('targets', encoded);
+      } else {
+        url.searchParams.delete('targets');
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [customTargets, saveLocation]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Temporal.Now.zonedDateTimeISO(tz)), 1000);
@@ -307,6 +358,36 @@ export default function App() {
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">カスタムターゲット</h2>
+            </div>
+
+            <div className="mb-4">
+              <div className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
+                <p className="font-semibold text-slate-700 dark:text-slate-300">データの保存先</p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSaveLocation('localStorage')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      saveLocation === 'localStorage'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-500'
+                    }`}
+                  >
+                    ローカルストレージ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSaveLocation('urlParams')}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      saveLocation === 'urlParams'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-500'
+                    }`}
+                  >
+                    URL
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3 mb-4">
