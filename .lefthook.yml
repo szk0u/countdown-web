@@ -6,4 +6,5 @@ pre-commit:
       run: pnpm exec eslint {staged_files}
     prettier:
       glob: '*.{ts,tsx,js,jsx,json,css,md,yml,yaml}'
-      run: pnpm exec prettier --check {staged_files}
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
