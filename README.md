@@ -10,6 +10,7 @@ React + TypeScript の静的サイトです。月末、四半期末、半期末�
 
 ```sh
 pnpm install
+pnpm lefthook install
 pnpm run dev
 ```
 
