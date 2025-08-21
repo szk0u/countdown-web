@@ -349,7 +349,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {allTargets.map((target, index) => {
-            const seconds = Math.floor(target.date.epochSeconds - now.epochSeconds);
+            const seconds = Math.floor((target.date.epochMilliseconds - now.epochMilliseconds) / 1000);
             const business = businessDaysBetween(now.toPlainDate(), target.date.toPlainDate());
             const days = Math.floor(seconds / 86400);
             const hours = Math.floor((seconds % 86400) / 3600);
