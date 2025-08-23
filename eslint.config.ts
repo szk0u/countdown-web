@@ -26,6 +26,10 @@ export default [
         setTimeout: 'readonly',
         URLSearchParams: 'readonly',
         URL: 'readonly',
+        atob: 'readonly',
+        btoa: 'readonly',
+        console: 'readonly',
+        history: 'readonly',
       },
     },
     plugins: {
