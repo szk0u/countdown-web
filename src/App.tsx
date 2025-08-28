@@ -235,7 +235,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 transition-colors duration-300">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-12">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-2xl">⏰</span>
@@ -255,7 +255,7 @@ export default function App() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col w-full gap-4 sm:w-auto sm:flex-row sm:items-center">
             {!isFormVisible && (
               <button
                 type="button"
@@ -268,7 +268,7 @@ export default function App() {
                     });
                   }, 100);
                 }}
-                className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
+                className="group relative w-full px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95 sm:w-auto"
               >
                 <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                   <span className="text-lg">➕</span>
@@ -279,7 +279,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setDark((d) => !d)}
-              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
+              className="group relative w-full px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95 sm:w-auto"
             >
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{dark ? '☀️' : '🌙'}</span>
@@ -289,7 +289,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setSimple((s) => !s)}
-              className="group relative px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95"
+              className="group relative w-full px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95 sm:w-auto"
             >
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{simple ? '🔢' : '📅'}</span>
