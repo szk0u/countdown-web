@@ -1,5 +1,6 @@
 /* eslint-env browser */
 'use client';
+/* global Notification, navigator */
 import React, { useEffect, useState, useRef } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
 import Holidays from 'date-holidays';
@@ -116,10 +117,19 @@ export default function App() {
     }
     return null;
   });
-  const [customTargets, setCustomTargets] = useState<{ id: string; label: string; date: string }[]>([]);
+  const [customTargets, setCustomTargets] = useState<
+    {
+      id: string;
+      label: string;
+      date: string;
+      notifyAt?: string;
+    }[]
+  >([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
   const [inputDate, setInputDate] = useState('');
+  const [inputNotifyAt, setInputNotifyAt] = useState('');
+  const scheduledIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const saved = localStorage.getItem('customTargets');
@@ -129,7 +139,40 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('customTargets', JSON.stringify(customTargets));
+  }, [customTargets]);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then((registration) => {
+        customTargets.forEach((t) => {
+          if (t.notifyAt && !scheduledIds.current.has(t.id)) {
+            scheduledIds.current.add(t.id);
+            const notificationTime = new Date(t.notifyAt).getTime();
+            const targetTime = Temporal.PlainDate.from(t.date)
+              .add({ days: 1 })
+              .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
+              .subtract({ nanoseconds: 1 }).epochMilliseconds;
+            const diff = targetTime - notificationTime;
+            const days = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            registration.active?.postMessage({
+              type: 'schedule',
+              title: `${t.label}までのカウントダウン`,
+              body: `${t.label}まであと${days}日${hours}時間${minutes}分`,
+              timestamp: notificationTime,
+            });
+          }
+        });
+      });
+    }
   }, [customTargets]);
 
   useEffect(() => {
@@ -161,10 +204,12 @@ export default function App() {
         id: Date.now().toString(),
         label: inputLabel,
         date: inputDate,
+        notifyAt: inputNotifyAt || undefined,
       };
       setCustomTargets((prevTargets) => [...prevTargets, newTarget]);
       setInputLabel('');
       setInputDate('');
+      setInputNotifyAt('');
       setIsFormVisible(false);
     }
   };
@@ -353,6 +398,13 @@ export default function App() {
                   required
                 />
               </div>
+              <input
+                type="datetime-local"
+                value={inputNotifyAt}
+                onChange={(e) => setInputNotifyAt(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 dark:text-slate-200 backdrop-blur-sm"
+                placeholder="通知日時"
+              />
               <div className="flex justify-end gap-4">
                 <button
                   type="button"
