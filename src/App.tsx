@@ -4,6 +4,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
 import Holidays from 'date-holidays';
 
+interface SharedTarget {
+  label: string;
+  date: Temporal.ZonedDateTime;
+  icon: string;
+  color: string;
+}
+
 const tz = 'Asia/Tokyo';
 const hd = new Holidays('JP');
 
@@ -107,7 +114,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
   });
-  const [targetsFromUrl, setTargetsFromUrl] = useState<any[] | null>(null);
+  const [targetsFromUrl, setTargetsFromUrl] = useState<SharedTarget[] | null>(null);
   const [targetFromUrl] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('name');
@@ -191,7 +198,7 @@ export default function App() {
     }
   };
 
-  const handleDeleteTarget = (idToDelete:string) => {
+  const handleDeleteTarget = (idToDelete: string) => {
     setCustomTargets((prevTargets) => prevTargets.filter((target) => target.id !== idToDelete));
   };
 
@@ -234,7 +241,7 @@ export default function App() {
       });
   };
 
-  let displayTargets;
+  let displayTargets: SharedTarget[];
 
   if (targetsFromUrl) {
     displayTargets = targetsFromUrl;
