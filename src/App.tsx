@@ -107,6 +107,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
   });
+  const [targetsFromUrl, setTargetsFromUrl] = useState<any[] | null>(null);
   const [targetFromUrl] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('name');
@@ -120,11 +121,32 @@ export default function App() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [inputLabel, setInputLabel] = useState('');
   const [inputDate, setInputDate] = useState('');
+  const [selectedTargets, setSelectedTargets] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const saved = localStorage.getItem('customTargets');
-    if (saved) {
-      setCustomTargets(JSON.parse(saved));
+    const params = new URLSearchParams(window.location.search);
+    const targetsParam = params.get('targets');
+    if (targetsParam) {
+      try {
+        const decoded = decodeURIComponent(targetsParam);
+        const parsed = JSON.parse(decoded);
+        if (Array.isArray(parsed)) {
+          const validatedTargets = parsed.map((t) => ({
+            label: t.label,
+            date: Temporal.ZonedDateTime.from(t.date),
+            icon: t.icon,
+            color: t.color,
+          }));
+          setTargetsFromUrl(validatedTargets);
+        }
+      } catch (e) {
+        console.error('Failed to parse targets from URL', e);
+      }
+    } else {
+      const saved = localStorage.getItem('customTargets');
+      if (saved) {
+        setCustomTargets(JSON.parse(saved));
+      }
     }
   }, []);
 
@@ -169,67 +191,113 @@ export default function App() {
     }
   };
 
-  const handleDeleteTarget = (idToDelete: string) => {
+  const handleDeleteTarget = (idToDelete:string) => {
     setCustomTargets((prevTargets) => prevTargets.filter((target) => target.id !== idToDelete));
   };
 
-  const allTargets = [
-    {
-      label: '月末',
-      date: endOfMonth(now),
-      icon: '📅',
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
-      label: '四半期末',
-      date: endOfQuarter(now),
-      icon: '📊',
-      color: 'from-purple-500 to-pink-500',
-    },
-    {
-      label: '半期末',
-      date: endOfHalfYear(now),
-      icon: '📈',
-      color: 'from-green-500 to-teal-500',
-    },
-    {
-      label: '年度末',
-      date: endOfFiscalYear(now),
-      icon: '🎯',
-      color: 'from-orange-500 to-red-500',
-    },
-  ];
+  const handleSelectTarget = (label: string) => {
+    setSelectedTargets((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(label)) {
+        newSet.delete(label);
+      } else {
+        newSet.add(label);
+      }
+      return newSet;
+    });
+  };
 
-  customTargets.forEach((target) => {
-    const customDate = Temporal.PlainDate.from(target.date)
-      .add({ days: 1 })
-      .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
-      .subtract({ nanoseconds: 1 });
+  const handleGenerateUrl = () => {
+    const selected = displayTargets.filter((target) => selectedTargets.has(target.label));
+    const serializableTargets = selected.map((target) => ({
+      label: target.label,
+      date: target.date.toString({ timeZoneName: 'never' }),
+      icon: target.icon,
+      color: target.color,
+    }));
+    const json = JSON.stringify(serializableTargets);
+    const encoded = encodeURIComponent(json);
 
-    if (Temporal.ZonedDateTime.compare(customDate, now) > 0) {
-      allTargets.unshift({
-        label: target.label,
-        date: customDate,
-        icon: '📌',
-        color: 'from-yellow-500 to-amber-500',
+    const url = new URL(window.location.origin);
+    url.searchParams.set('targets', encoded);
+    if (dark) url.searchParams.set('dark', 'true');
+    if (simple) url.searchParams.set('simple', 'true');
+
+    navigator.clipboard
+      .writeText(url.toString())
+      .then(() => {
+        alert('共有用URLをクリップボードにコピーしました');
+      })
+      .catch((err) => {
+        console.error('クリップボードへのコピーに失敗しました', err);
+        alert('URLのコピーに失敗しました');
       });
-    }
-  });
+  };
 
-  if (targetFromUrl) {
-    const urlDate = Temporal.PlainDate.from(targetFromUrl.date)
-      .add({ days: 1 })
-      .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
-      .subtract({ nanoseconds: 1 });
+  let displayTargets;
 
-    if (Temporal.ZonedDateTime.compare(urlDate, now) > 0) {
-      allTargets.unshift({
-        label: targetFromUrl.label,
-        date: urlDate,
-        icon: '🔗',
-        color: 'from-pink-500 to-rose-500',
-      });
+  if (targetsFromUrl) {
+    displayTargets = targetsFromUrl;
+  } else {
+    const defaultTargets = [
+      {
+        label: '月末',
+        date: endOfMonth(now),
+        icon: '📅',
+        color: 'from-blue-500 to-cyan-500',
+      },
+      {
+        label: '四半期末',
+        date: endOfQuarter(now),
+        icon: '📊',
+        color: 'from-purple-500 to-pink-500',
+      },
+      {
+        label: '半期末',
+        date: endOfHalfYear(now),
+        icon: '📈',
+        color: 'from-green-500 to-teal-500',
+      },
+      {
+        label: '年度末',
+        date: endOfFiscalYear(now),
+        icon: '🎯',
+        color: 'from-orange-500 to-red-500',
+      },
+    ];
+
+    customTargets.forEach((target) => {
+      const customDate = Temporal.PlainDate.from(target.date)
+        .add({ days: 1 })
+        .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
+        .subtract({ nanoseconds: 1 });
+
+      if (Temporal.ZonedDateTime.compare(customDate, now) > 0) {
+        defaultTargets.unshift({
+          label: target.label,
+          date: customDate,
+          icon: '📌',
+          color: 'from-yellow-500 to-amber-500',
+        });
+      }
+    });
+
+    if (targetFromUrl) {
+      const urlDate = Temporal.PlainDate.from(targetFromUrl.date)
+        .add({ days: 1 })
+        .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
+        .subtract({ nanoseconds: 1 });
+
+      if (Temporal.ZonedDateTime.compare(urlDate, now) > 0) {
+        defaultTargets.unshift({
+          label: targetFromUrl.label,
+          date: urlDate,
+          icon: '🔗',
+          color: 'from-pink-500 to-rose-500',
+        });
+      }
     }
+    displayTargets = defaultTargets;
   }
 
   return (
@@ -296,6 +364,18 @@ export default function App() {
                 <span className="font-medium">{simple ? '詳細' : 'シンプル'}</span>
               </div>
             </button>
+            {selectedTargets.size > 0 && (
+              <button
+                type="button"
+                onClick={handleGenerateUrl}
+                className="group relative w-full px-6 py-3 bg-green-500/20 dark:bg-green-500/50 backdrop-blur-sm border border-green-500/30 dark:border-green-500/50 rounded-2xl hover:bg-green-500/30 dark:hover:bg-green-500/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95 sm:w-auto"
+              >
+                <div className="flex items-center justify-center gap-2 text-green-700 dark:text-green-300">
+                  <span className="text-lg">🔗</span>
+                  <span className="font-medium">共有URLを生成</span>
+                </div>
+              </button>
+            )}
           </div>
         </div>
 
@@ -373,7 +453,7 @@ export default function App() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {allTargets.map((target, index) => {
+          {displayTargets.map((target, index) => {
             const seconds = Math.floor((target.date.epochMilliseconds - now.epochMilliseconds) / 1000);
             const business = businessDaysBetween(now.toPlainDate(), target.date.toPlainDate());
             const days = Math.floor(seconds / 86400);
@@ -413,6 +493,12 @@ export default function App() {
                         </p>
                       </div>
                     </div>
+                    <input
+                      type="checkbox"
+                      className="h-6 w-6 rounded-md border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-700/50 text-blue-600 focus:ring-blue-500 transition-all duration-200 cursor-pointer"
+                      checked={selectedTargets.has(target.label)}
+                      onChange={() => handleSelectTarget(target.label)}
+                    />
                   </div>
 
                   {simple ? (
