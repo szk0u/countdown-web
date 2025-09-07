@@ -107,6 +107,10 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('simple') === 'true';
   });
+  const [includeTargetDate, setIncludeTargetDate] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('include') !== 'false';
+  });
   const [targetFromUrl] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('name');
@@ -154,6 +158,16 @@ export default function App() {
     window.history.replaceState({}, '', url.toString());
   }, [simple]);
 
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (includeTargetDate) {
+      url.searchParams.delete('include');
+    } else {
+      url.searchParams.set('include', 'false');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [includeTargetDate]);
+
   const handleAddTarget = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputLabel && inputDate) {
@@ -173,7 +187,7 @@ export default function App() {
     setCustomTargets((prevTargets) => prevTargets.filter((target) => target.id !== idToDelete));
   };
 
-  const allTargets = [
+  const builtTargets = [
     {
       label: '月末',
       date: endOfMonth(now),
@@ -198,18 +212,26 @@ export default function App() {
       icon: '🎯',
       color: 'from-orange-500 to-red-500',
     },
-  ];
+  ]
+    .map((t) => ({
+      ...t,
+      date: includeTargetDate ? t.date : t.date.subtract({ days: 1 }),
+    }))
+    .filter((t) => Temporal.ZonedDateTime.compare(t.date, now) > 0);
+
+  const allTargets = [...builtTargets];
 
   customTargets.forEach((target) => {
     const customDate = Temporal.PlainDate.from(target.date)
       .add({ days: 1 })
       .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
       .subtract({ nanoseconds: 1 });
+    const adjustedCustomDate = includeTargetDate ? customDate : customDate.subtract({ days: 1 });
 
-    if (Temporal.ZonedDateTime.compare(customDate, now) > 0) {
+    if (Temporal.ZonedDateTime.compare(adjustedCustomDate, now) > 0) {
       allTargets.unshift({
         label: target.label,
-        date: customDate,
+        date: adjustedCustomDate,
         icon: '📌',
         color: 'from-yellow-500 to-amber-500',
       });
@@ -221,11 +243,12 @@ export default function App() {
       .add({ days: 1 })
       .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
       .subtract({ nanoseconds: 1 });
+    const adjustedUrlDate = includeTargetDate ? urlDate : urlDate.subtract({ days: 1 });
 
-    if (Temporal.ZonedDateTime.compare(urlDate, now) > 0) {
+    if (Temporal.ZonedDateTime.compare(adjustedUrlDate, now) > 0) {
       allTargets.unshift({
         label: targetFromUrl.label,
-        date: urlDate,
+        date: adjustedUrlDate,
         icon: '🔗',
         color: 'from-pink-500 to-rose-500',
       });
@@ -294,6 +317,16 @@ export default function App() {
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{simple ? '🔢' : '📅'}</span>
                 <span className="font-medium">{simple ? '詳細' : 'シンプル'}</span>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIncludeTargetDate((i) => !i)}
+              className="group relative w-full px-6 py-3 bg-white/20 dark:bg-slate-800/50 backdrop-blur-sm border border-white/30 dark:border-slate-700/50 rounded-2xl hover:bg-white/30 dark:hover:bg-slate-800/70 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer active:scale-95 sm:w-auto"
+            >
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <span className="text-lg">{includeTargetDate ? '➖' : '➕'}</span>
+                <span className="font-medium">{includeTargetDate ? '含めない' : '含める'}</span>
               </div>
             </button>
           </div>
