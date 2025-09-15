@@ -187,7 +187,7 @@ export default function App() {
     setCustomTargets((prevTargets) => prevTargets.filter((target) => target.id !== idToDelete));
   };
 
-  const builtTargets = [
+  const baseTargets = [
     {
       label: '月末',
       date: endOfMonth(now),
@@ -212,12 +212,11 @@ export default function App() {
       icon: '🎯',
       color: 'from-orange-500 to-red-500',
     },
-  ]
-    .map((t) => ({
-      ...t,
-      date: includeTargetDate ? t.date : t.date.subtract({ days: 1 }),
-    }))
-    .filter((t) => Temporal.ZonedDateTime.compare(t.date, now) > 0);
+  ];
+
+  const filterDate = includeTargetDate ? now : now.add({ days: 1 });
+
+  const builtTargets = baseTargets.filter((t) => Temporal.ZonedDateTime.compare(t.date, filterDate) > 0);
 
   const allTargets = [...builtTargets];
 
@@ -226,12 +225,11 @@ export default function App() {
       .add({ days: 1 })
       .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
       .subtract({ nanoseconds: 1 });
-    const adjustedCustomDate = includeTargetDate ? customDate : customDate.subtract({ days: 1 });
 
-    if (Temporal.ZonedDateTime.compare(adjustedCustomDate, now) > 0) {
+    if (Temporal.ZonedDateTime.compare(customDate, filterDate) > 0) {
       allTargets.unshift({
         label: target.label,
-        date: adjustedCustomDate,
+        date: customDate,
         icon: '📌',
         color: 'from-yellow-500 to-amber-500',
       });
@@ -243,12 +241,11 @@ export default function App() {
       .add({ days: 1 })
       .toZonedDateTime({ timeZone: tz, plainTime: '00:00:00' })
       .subtract({ nanoseconds: 1 });
-    const adjustedUrlDate = includeTargetDate ? urlDate : urlDate.subtract({ days: 1 });
 
-    if (Temporal.ZonedDateTime.compare(adjustedUrlDate, now) > 0) {
+    if (Temporal.ZonedDateTime.compare(urlDate, filterDate) > 0) {
       allTargets.unshift({
         label: targetFromUrl.label,
-        date: adjustedUrlDate,
+        date: urlDate,
         icon: '🔗',
         color: 'from-pink-500 to-rose-500',
       });
@@ -326,7 +323,9 @@ export default function App() {
             >
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                 <span className="text-lg">{includeTargetDate ? '➖' : '➕'}</span>
-                <span className="font-medium">{includeTargetDate ? '含めない' : '含める'}</span>
+                <span className="font-medium">
+                  {includeTargetDate ? '対象日を日数に含めない' : '対象を日数に含める'}
+                </span>
               </div>
             </button>
           </div>
@@ -408,8 +407,11 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {allTargets.map((target, index) => {
             const seconds = Math.floor((target.date.epochMilliseconds - now.epochMilliseconds) / 1000);
-            const business = businessDaysBetween(now.toPlainDate(), target.date.toPlainDate());
-            const days = Math.floor(seconds / 86400);
+            const baseDays = Math.floor(seconds / 86400);
+            const days = includeTargetDate ? baseDays + 1 : baseDays;
+            const business = includeTargetDate
+              ? businessDaysBetween(now.toPlainDate(), target.date.toPlainDate())
+              : businessDaysBetween(now.toPlainDate(), target.date.toPlainDate().subtract({ days: 1 }));
             const hours = Math.floor((seconds % 86400) / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
             const secs = seconds % 60;
