@@ -33,7 +33,7 @@
     "gh-pages": "^6.3.0",
     "lefthook": "^2.0.12",
     "prettier": "^3.7.4",
-    "tailwindcss": "^4.1.17",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.0"
   }
