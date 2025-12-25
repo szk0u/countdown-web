@@ -1,4 +1,3 @@
-/* eslint-env browser */
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
@@ -6,6 +5,15 @@ import Holidays from 'date-holidays';
 
 const tz = 'Asia/Tokyo';
 const hd = new Holidays('JP');
+
+function isValidPlainDateString(value: string): boolean {
+  try {
+    Temporal.PlainDate.from(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function endOfMonth(now: Temporal.ZonedDateTime): Temporal.ZonedDateTime {
   return now
@@ -111,7 +119,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('name');
     const date = params.get('date');
-    if (name && date) {
+    if (name && date && isValidPlainDateString(date)) {
       return { label: name, date };
     }
     return null;
@@ -123,8 +131,28 @@ export default function App() {
 
   useEffect(() => {
     const saved = localStorage.getItem('customTargets');
-    if (saved) {
-      setCustomTargets(JSON.parse(saved));
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return;
+
+      const sanitized = parsed.filter(
+        (target): target is { id: string; label: string; date: string } =>
+          target &&
+          typeof target.id === 'string' &&
+          typeof target.label === 'string' &&
+          typeof target.date === 'string' &&
+          isValidPlainDateString(target.date)
+      );
+
+      if (sanitized.length !== parsed.length) {
+        localStorage.setItem('customTargets', JSON.stringify(sanitized));
+      }
+
+      setCustomTargets(sanitized);
+    } catch {
+      localStorage.removeItem('customTargets');
     }
   }, []);
 
@@ -156,7 +184,7 @@ export default function App() {
 
   const handleAddTarget = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputLabel && inputDate) {
+    if (inputLabel && inputDate && isValidPlainDateString(inputDate)) {
       const newTarget = {
         id: Date.now().toString(),
         label: inputLabel,
