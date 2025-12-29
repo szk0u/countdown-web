@@ -7,8 +7,10 @@ import type { Linter } from 'eslint';
 
 export default [
   {
+    ignores: ['node_modules', 'dist', 'playwright.config.ts', 'e2e'],
+  },
+  {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['node_modules', 'dist'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
