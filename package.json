@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.5.1",
-    "date-holidays": "^3.26.8",
+    "date-holidays": "^3.26.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
