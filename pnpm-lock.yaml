@@ -12,8 +12,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       date-holidays:
-        specifier: ^3.26.12
-        version: 3.26.12
+        specifier: ^3.27.0
+        version: 3.27.0
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -923,8 +923,8 @@ packages:
     resolution: {integrity: sha512-h09ZEtM6u5cYM6m1bX+1Ny9f+nLO9KVZUKNPEnH7lhbXYTfqZogaGTnhONswGeIJFF91UImIftS3CdM9HLW5oQ==}
     engines: {node: '>=12.0.0'}
 
-  date-holidays@3.26.12:
-    resolution: {integrity: sha512-2OXPk5Nbt4iyKLIaoqiCkiQFt+zxGA3SZ3CWMldy8YXq6Zisv+CguVM8TqrKaGEoiZY2gzGH6qCDCrbFoZFyBA==}
+  date-holidays@3.27.0:
+    resolution: {integrity: sha512-yFTDzUEUxo9I8wbgFg5DFxZq08FhSpJ3gGaAulkOhIYogtIFdWjMz44w6RSRwAa4FxGozTWMY/hk+r5PW7KdvQ==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -1558,8 +1558,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -2841,11 +2841,11 @@ snapshots:
       jalaali-js: 1.2.8
       moment-timezone: 0.5.48
 
-  date-holidays@3.26.12:
+  date-holidays@3.27.0:
     dependencies:
       date-holidays-parser: 3.4.7
       js-yaml: 4.1.1
-      lodash: 4.17.23
+      lodash: 4.18.1
       prepin: 1.0.3
 
   debug@4.4.3:
@@ -3581,7 +3581,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.1: {}
 
   loose-envify@1.4.0:
     dependencies:
